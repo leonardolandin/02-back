@@ -1,10 +1,10 @@
 const mongoDB = require('../database');
-const User = require('../model/UserModel')
-const AssignmentAPI = {}
+const Assignment = require('../model/AssignmentModel')
+const AssignmentDAO = {}
 
 
 
-module.exports = AssignmentAPI;
+module.exports = AssignmentDAO;
 
 
 
