@@ -1,5 +1,5 @@
 const AssignmentDAO = require('../../dao/AssignmentDAO');
-const Assignment = require('../../model/AssignmentModel');
+const UserDAO = require('../../dao/UserDAO');
 
 module.exports = (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -16,20 +16,22 @@ module.exports = (req, res) => {
 
     const validateAssignment = (dataAssignment) => {     
         if(dataAssignment.nameAssignment && dataAssignment.nameAssignment.length > 128) {
-            validateException(res, "A nome da atividade não pode ultrapassar 128 caracteres")
+            return validateException(res, "A nome da atividade não pode ultrapassar 128 caracteres")
         }
         if(dataAssignment.descriptionAssignment && dataAssignment.descriptionAssignment.length > 252) {
-            validateException(res, "A descrição da atividade não pode ultrapassar 252 caracteres")
+            return validateException(res, "A descrição da atividade não pode ultrapassar 252 caracteres")
         }
         if(dataAssignment.typeAssignment && parseInt(dataAssignment.typeAssignment) === 0) {
-            validateException(res, "É necessário escolher uma escolaridade")
+            return validateException(res, "É necessário escolher uma escolaridade")
         }
         if(dataAssignment.imageUpload && dataAssignment.imageUpload.stringBase64 && !dataAssignment.imageUpload.stringBase64.length) {
-            validateException(res, "Nenhuma imagem foi selecionada")
+            return validateException(res, "Nenhuma imagem foi selecionada")
         }
         if(dataAssignment.imageUpload && dataAssignment.imageUpload.name && !dataAssignment.imageUpload.name.length) {
-            validateException(res, "A imagem selecionada não possui nome")
+            return validateException(res, "A imagem selecionada não possui nome")
         }
+
+        return true
     }
 
     const getTypeEnum = (type) => {
@@ -57,20 +59,35 @@ module.exports = (req, res) => {
     }
 
     if(dataUpload && validateAssignment(dataUpload)) {
-        console.log('entrou')
         if(dataUpload.user.id && dataUpload.user.id.length) {
-            console.log('entrou 2')
-            let enumType = getTypeEnum(dataUpload.typeAssignment)
-            let autorBool = isBoolean(dataUpload.isAutor)
 
-            let assignmentMongo = {
-                nameAssignment: dataUpload.name,
-                descriptionAssignment: dataUpload.descriptionAssignment,
-                typeAssignment: enumType,
-                isAutor: autorBool
-            }
+            UserDAO.getUserById(dataUpload.user.id).then((data) => {
+                if(data && dataUpload.user.email === data.email) {
+                    let enumType = getTypeEnum(dataUpload.typeAssignment);
+                    let autorBool = isBoolean(dataUpload.isAutor);
+                    let dateNow = new Date();
+                    dateNow.setSeconds(0,0);
+        
+                    let assignmentMongo = {
+                        nameAssignment: dataUpload.nameAssignment,
+                        descriptionAssignment: dataUpload.descriptionAssignment,
+                        typeAssignment: enumType,
+                        isAutor: autorBool,
+                        imageUpload: dataUpload.imageUpload,
+                        created: dateNow,
+                        modificated: null,
+                        userUploaded: dataUpload.user.id
+                    }
 
-            res.send('viva')
+                    AssignmentDAO.createNewAssignment(assignmentMongo).then((data) => {
+                        let sendObj = {
+                            msg: 'Atividade criada com sucesso'
+                        }
+                        res.status(201)
+                        res.send(sendObj)
+                    })
+                }
+            })
         }
     }
 }
