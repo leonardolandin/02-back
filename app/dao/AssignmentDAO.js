@@ -10,6 +10,22 @@ AssignmentDAO.createNewAssignment = async function(assignmentInfos) {
     })
 }
 
+AssignmentDAO.getAssignments = async function() {
+    return Assignment.find({}, (err, result) => {
+        return new Promise((resolve, reject) => {
+            resolve(result)
+        })
+    })
+}
+
+AssignmentDAO.getAssignmentById = async function(idAssigment) {
+    return Assignment.findOne({'_id':idAssigment}, (err, result) => {
+        return new Promise((resolve, reject) => {
+            resolve(result)
+        })
+    })
+}
+
 module.exports = AssignmentDAO;
 
 

@@ -66,7 +66,8 @@ module.exports = (req, res) => {
                     let enumType = getTypeEnum(dataUpload.typeAssignment);
                     let autorBool = isBoolean(dataUpload.isAutor);
                     let dateNow = new Date();
-                    dateNow.setSeconds(0,0);
+                    let data2 = new Date(dateNow.valueOf() - dateNow.getTimezoneOffset() * 60000);
+                    let dataBase = data2.toISOString().replace(/\.\d{3}Z$/, '');
         
                     let assignmentMongo = {
                         nameAssignment: dataUpload.nameAssignment,
@@ -74,7 +75,7 @@ module.exports = (req, res) => {
                         typeAssignment: enumType,
                         isAutor: autorBool,
                         imageUpload: dataUpload.imageUpload,
-                        created: dateNow,
+                        created: dataBase,
                         modificated: null,
                         userUploaded: dataUpload.user.id
                     }

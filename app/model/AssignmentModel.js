@@ -10,8 +10,8 @@ const dataSchema = new mongoDB.Schema({
     },
     isAutor: Boolean,
     imageUpload: Object,
-    created: Date,
-    modificated: Date || null,
+    created: String,
+    modificated: String || null,
     userUploaded: String
 })
 const Assignment = mongoDB.model('assignment', dataSchema, 'assignments')
