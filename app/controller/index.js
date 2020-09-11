@@ -1,2 +1,3 @@
-module.exports = (a, b) => {
+module.exports = (req, res) => {
+    res.send('a')
 }
