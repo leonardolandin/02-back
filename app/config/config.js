@@ -15,8 +15,14 @@ app.use(bodyParser.json({
 
 
 app.use(express.json());
+
+//Assignment's
+
 app.use('/', routes);
 app.use('/uploadAssignments/', routes);
 app.use('/getAssignment/:idAssignment', routes);
+
+//Auth
+app.use('/userLogged/:userToken', routes);
 
 module.exports = app;
