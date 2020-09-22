@@ -14,6 +14,6 @@ routes.post('/uploadAssignments', uploadAssignments);
 
 //Auth
 routes.get('/userLogged/:userToken', getUser);
-routes.post('/login', getUser);
+routes.post('/login', login);
 
 module.exports = routes;
