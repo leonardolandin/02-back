@@ -25,5 +25,6 @@ app.use('/getAssignment/:idAssignment', routes);
 //Auth
 app.use('/userLogged', routes);
 app.use('/login', routes);
+app.use('/register', routes);
 
 module.exports = app;

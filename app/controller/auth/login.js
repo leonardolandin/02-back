@@ -1,8 +1,8 @@
 const UserDAO = require('../../dao/UserDAO');
-const Crypt = require('../../utils/crypt')
+const Crypt = require('../../utils/crypt');
 const https = require('https');
 const jwt = require('jsonwebtoken');
-const Constants = require('../../utils/constants')
+const Constants = require('../../utils/constants');
 
 require('dotenv/config');
 
