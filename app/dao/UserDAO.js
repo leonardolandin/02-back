@@ -3,7 +3,7 @@ const User = require('../model/UserModel')
 const UserDAO = {}
 
 UserDAO.getUserByEmail = async function(objCredentials) {
-    return User.findOne({'email': objCredentials}, (err, result) => {
+    return User.findOne({'email': objCredentials, 'active': true}, (err, result) => {
         return new Promise((resolve, reject) => {
             resolve(result)
         })

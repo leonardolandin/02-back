@@ -57,17 +57,25 @@ module.exports = (req, res) => {
                             let userToken = jwt.sign(dataUser, process.env.JWT, {expiresIn: "12h"});
                             let parsedResponse = JSON.parse(dataRaw);
 
-                            if(userToken !== null) {
-                                UserDAO.setNewToken(userID, userToken).then((resp) => {
-                                    if(parsedResponse != null) {
-                                        let responseData = {
-                                            user: dataDAO,
-                                            recaptcha: parsedResponse
-                                        }
-                                        res.status(Constants.STATUS.OK)
-                                        res.send(responseData)
-                                    }  
-                                })
+                            if(parsedResponse.success) {
+                                if(userToken !== null) {
+                                    UserDAO.setNewToken(userID, userToken).then((resp) => {
+                                        if(parsedResponse != null) {
+                                            let responseData = {
+                                                user: {
+                                                    name: dataDAO.name,
+                                                    email: dataDAO.email,
+                                                    token: userToken,
+                                                    created: dataDAO.created,
+                                                    password: dataDAO.password
+                                                },
+                                                recaptcha: parsedResponse
+                                            }
+                                            res.status(Constants.STATUS.OK)
+                                            res.send(responseData)
+                                        }  
+                                    })
+                                }
                             }
                         } catch (e) {
                             res.status(Constants.STATUS.UNAUTHORIZED)

@@ -23,7 +23,7 @@ app.use('/uploadAssignments/', routes);
 app.use('/getAssignment/:idAssignment', routes);
 
 //Auth
-app.use('/userLogged/:userToken', routes);
+app.use('/userLogged', routes);
 app.use('/login', routes);
 
 module.exports = app;

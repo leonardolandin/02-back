@@ -13,7 +13,7 @@ routes.post('/uploadAssignments', uploadAssignments);
 
 
 //Auth
-routes.get('/userLogged/:userToken', getUser);
+routes.post('/userLogged', getUser);
 routes.post('/login', login);
 
 module.exports = routes;
