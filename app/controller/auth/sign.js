@@ -34,9 +34,9 @@ module.exports = (req, res) => {
 
     const ValidationException = (message, response) => {
         let sendObject = {
-            statusCode: Constants.STATUS.UNAUTHORIZED,
             message: message
         }
+        response.status(Constants.STATUS.UNAUTHORIZED)
         response.send(sendObject)
     }
 
@@ -58,11 +58,11 @@ module.exports = (req, res) => {
                             let userToken = jwt.sign(dataUser, process.env.JWT, {expiresIn: "12h"});
                             let parsedResponse = JSON.parse(dataRaw);
 
-                            if(userToken !== null && parsedResponse !== null) {
+                            if(userToken !== null && parsedResponse !== null && parsedResponse.success) {
                                 let dateNow = new Date();
                                 dateNow.setSeconds(0, 0);
                                 dataUser.password = Crypt.encryptPassword(dataUser.password);
-                                dataUser.passwordConfirmed = Crypt.encryptPassword(dataUser.passwordConfirmed);
+                                dataUser.passwordConfirmed = data.password;
 
                                 dataUser.token = userToken;
                                 dataUser.active = true;
@@ -72,15 +72,15 @@ module.exports = (req, res) => {
 
                                 UserDAO.createNewUser(dataUser).then((result) => {
                                     let responseData = {
-                                        user: dataUser,
-                                        recaptcha: parsedResponse,
-                                        statusCode: 200
+                                        user: dataUser
                                     }
 
+                                    res.status(Constants.STATUS.CREATED)
                                     res.send(responseData);
                                 })
                             }
                         } catch (e) {
+                            return ValidationException('Ocorreu um erro inesperado', res)
                         }
                     })
                 })
