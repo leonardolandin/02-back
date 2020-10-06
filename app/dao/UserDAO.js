@@ -28,4 +28,12 @@ UserDAO.getUserById = async function(idUser) {
     })
 }
 
+UserDAO.createNewUser = async function(newUserCredentials) {
+    return User.insertMany(newUserCredentials, (err, result) => {
+        return new Promise((resolve, reject) => {
+            resolve(result)
+        })
+    })
+}
+
 module.exports = UserDAO;

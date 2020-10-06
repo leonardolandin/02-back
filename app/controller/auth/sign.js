@@ -3,6 +3,7 @@ const https = require('https');
 const jwt = require('jsonwebtoken');
 const Crypt = require('../../utils/crypt');
 const Constants = require('../../utils/constants');
+const { type } = require('os');
 require('dotenv/config');
 
 
@@ -32,9 +33,11 @@ module.exports = (req, res) => {
         return true;
     }
 
-    const ValidationException = (message, response) => {
+    const ValidationException = (message, response, codeError) => {
+        console.log(typeof codeError)
         let sendObject = {
-            message: message
+            message: message,
+            error: codeError
         }
         response.status(Constants.STATUS.UNAUTHORIZED)
         response.send(sendObject)
@@ -62,7 +65,6 @@ module.exports = (req, res) => {
                                 let dateNow = new Date();
                                 dateNow.setSeconds(0, 0);
                                 dataUser.password = Crypt.encryptPassword(dataUser.password);
-                                dataUser.passwordConfirmed = data.password;
 
                                 dataUser.token = userToken;
                                 dataUser.active = true;
@@ -80,7 +82,7 @@ module.exports = (req, res) => {
                                 })
                             }
                         } catch (e) {
-                            return ValidationException('Ocorreu um erro inesperado', res)
+                            return ValidationException('Ocorreu um erro inesperado', res, e)
                         }
                     })
                 })
