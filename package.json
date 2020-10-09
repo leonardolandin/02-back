@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js",
-    "prod": "node server.js"
+    "start": "node server.js",
+    "local": "nodemon server.js"
   },
   "repository": {
     "type": "git",
