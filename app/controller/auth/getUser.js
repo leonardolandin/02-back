@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const UserAPI = require('../../dao/UserDAO');
+const Constants = require('../../utils/constants');
 
 module.exports = (req, res) => {
     let userToken = req.body.token;
@@ -9,16 +10,16 @@ module.exports = (req, res) => {
             let validationToken = jwt.verify(userToken, process.env.JWT);   
             if(validationToken.email !== undefined) {
                 UserAPI.getUserByEmail(validationToken.email).then((data) => {
-                    res.status(200)
+                    res.status(Constants.STATUS.OK)
                     res.send(data)
                 })
             }
         } catch(error) {
-            res.status(401)
+            res.status(Constants.STATUS.UNAUTHORIZED)
             res.send(error)
         }
     } else {
-        res.status(401)
+        res.status(Constants.STATUS.UNAUTHORIZED)
         res.send()
     }
 }

@@ -1,4 +1,3 @@
-const mongoDB = require('../database');
 const User = require('../model/UserModel')
 const UserDAO = {}
 
