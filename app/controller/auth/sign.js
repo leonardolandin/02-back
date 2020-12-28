@@ -1,9 +1,8 @@
 const UserDAO = require('../../dao/UserDAO');
-const https = require('https');
 const jwt = require('jsonwebtoken');
 const Crypt = require('../../utils/crypt');
 const Constants = require('../../utils/constants');
-const { type } = require('os');
+const http = require('../../config/axios');
 require('dotenv/config');
 
 
@@ -53,38 +52,34 @@ module.exports = (req, res) => {
                 const secretRecaptcha = process.env.RECAPTCHA_KEY;
                 const recaptchaVerification = `https://www.google.com/recaptcha/api/siteverify?secret=${secretRecaptcha}&response=${dataUser.recaptcha}&remoteip=${req.connection.remoteAddress}`;
 
-                https.get(recaptchaVerification, (response) => {
-                    let dataRaw = '';
-                    response.on('data', (dataRawTO) => { dataRaw += dataRawTO })
-                    response.on('end', () => {
-                        try {
-                            let userToken = jwt.sign(dataUser, process.env.JWT, {expiresIn: "12h"});
-                            let parsedResponse = JSON.parse(dataRaw);
+                http.get(recaptchaVerification).then(response => {
+                    try {
+                        let userToken = jwt.sign(dataUser, process.env.JWT, {expiresIn: "12h"});
+                        let parsedResponse = response.data;
 
-                            if(userToken !== null && parsedResponse !== null && parsedResponse.success) {
-                                let dateNow = new Date();
-                                dateNow.setSeconds(0, 0);
-                                dataUser.password = Crypt.encryptPassword(dataUser.password);
+                        if(userToken !== null && parsedResponse !== null && parsedResponse.success) {
+                            let dateNow = new Date();
+                            dateNow.setSeconds(0, 0);
+                            dataUser.password = Crypt.encryptPassword(dataUser.password);
 
-                                dataUser.token = userToken;
-                                dataUser.active = true;
-                                dataUser.completeRegister = true;
-                                dataUser.created = dateNow;
-                                dataUser.modificated = null;
+                            dataUser.token = userToken;
+                            dataUser.active = true;
+                            dataUser.completeRegister = true;
+                            dataUser.created = dateNow;
+                            dataUser.modificated = null;
 
-                                UserDAO.createNewUser(dataUser).then((result) => {
-                                    let responseData = {
-                                        user: dataUser
-                                    }
+                            UserDAO.createNewUser(dataUser).then((result) => {
+                                let responseData = {
+                                    user: dataUser
+                                }
 
-                                    res.status(Constants.STATUS.CREATED)
-                                    res.send(responseData);
-                                })
-                            }
-                        } catch (e) {
-                            return ValidationException('Ocorreu um erro inesperado', res, e)
+                                res.status(Constants.STATUS.CREATED)
+                                res.send(responseData);
+                            })
                         }
-                    })
+                    } catch (e) {
+                        return ValidationException('Ocorreu um erro inesperado', res, e)
+                    }
                 })
             } else {
                 return ValidationException('O e-mail já está cadastrado no site', res)
