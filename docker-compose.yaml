@@ -8,7 +8,7 @@ services:
     working_dir: /app
     ports:
      - 8081:8081
-    command: ['npm', 'run' ,'start']
+    command: ['npm', 'run' ,'local']
     environment:
       PORT: ${PORT}
       MONGO_DB: ${MONGO_DB}
@@ -16,3 +16,4 @@ services:
       ENCRYPT_KEY: ${ENCRYPT_KEY}
       ENCRYPT_ALGORITHM: ${ENCRYPT_ALGORITHM}
       ENCRYPT_TYPE: ${ENCRYPT_TYPE}
+      CORS_ORIGINS: ${CORS_ORIGINS}

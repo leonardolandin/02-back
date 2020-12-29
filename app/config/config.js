@@ -9,9 +9,20 @@ app.use(bodyParser.json({
     extended: true
 }));
 
-app.use(cors());
+let whiteList = JSON.parse(process.env.CORS_ORIGINS);
 
+let corsOptions = {
+    origin: function(origin, callback) {
+        if(whiteList.indexOf(origin) !== -1) {
+            return callback(null, true);
+        } else {
+            return callback(null, false);
+        }
+    },
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS']
+}
 
+app.use(cors(corsOptions));
 app.use(express.json());
 
 //Assignment's
