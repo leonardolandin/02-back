@@ -1,6 +1,6 @@
 const mongoDB = require('../database');
 
-const dataSchema = new mongoDB.Schema({
+const dataSchema = new mongoDB.MongoDB.Schema({
     nameAssignment: String,
     descriptionAssignment: String,
     typeAssignment: {
@@ -14,7 +14,7 @@ const dataSchema = new mongoDB.Schema({
     modificated: String || null,
     userUploaded: String
 })
-const Assignment = mongoDB.model('assignment', dataSchema, 'assignments')
+const Assignment = mongoDB.MongoDB.model('assignment', dataSchema, 'assignments')
 
 
 module.exports = Assignment 

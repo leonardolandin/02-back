@@ -42,7 +42,7 @@ module.exports = (req, res) => {
                return ValidationException('Não existe um usuário com esse e-mail', res) 
             }
 
-            dataDAO.password = Crypt.decryptPassword(dataDAO.password); 
+            dataDAO.password = Crypt.decryptPassword(dataDAO.password);
 
             if(dataUser.email == dataDAO.email && dataUser.password == dataDAO.password) {
                 const secretKey = process.env.RECAPTCHA_KEY;

@@ -33,7 +33,6 @@ module.exports = (req, res) => {
     }
 
     const ValidationException = (message, response, codeError) => {
-        console.log(typeof codeError)
         let sendObject = {
             message: message,
             error: codeError
