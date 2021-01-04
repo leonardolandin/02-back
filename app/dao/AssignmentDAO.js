@@ -14,13 +14,14 @@ AssignmentDAO.createNewAssignment = async function(assignmentInfos) {
 }
 
 AssignmentDAO.getAssignments = async function() {
-    if(MongoDB.connect())
-    return Assignment.find({}, (err, result) => {
-        return new Promise((resolve, reject) => {
-            resolve(result)
-            MongoDB.close();
+    if(MongoDB.connect()) {
+        return Assignment.find({}, {_id: 1, imageUpload: 1, nameAssignment: 1} ,(err, result) => {
+            return new Promise((resolve, reject) => {
+                resolve(result)
+                MongoDB.close();
+            })
         })
-    })
+    }
 }
 
 AssignmentDAO.getAssignmentById = async function(idAssigment) {

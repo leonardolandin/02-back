@@ -1,11 +1,9 @@
 const AssignmentDAO = require('../../dao/AssignmentDAO');
-
+const Constants = require('../../utils/constants');
 
 module.exports = (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
-
     AssignmentDAO.getAssignments().then((list) => {
-        res.status(200);
+        res.status(Constants.STATUS.OK);
         res.send(list);
     })
 }
