@@ -1,94 +1,83 @@
 const AssignmentDAO = require('../../dao/AssignmentDAO');
 const UserDAO = require('../../dao/UserDAO');
+const jwt = require('jsonwebtoken');
+const Constants = require('../../utils/constants');
+const AssignmentUtils = require('../../utils/assignment');
+const { mongo } = require('mongoose');
 
 module.exports = (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
+    let token = req.headers.authorization;
     let dataUpload = req.body;
 
-    const validateException = (response, message) => {
+    const validateException = (response, message, status, error) => {
         let objReject = {
-            messageError: message
+            message: message,
+            error: error
         }
 
-        response.status(403)
+        response.status(status)
         response.send(objReject)
     }
 
-    const validateAssignment = (dataAssignment) => {     
-        if(dataAssignment.nameAssignment && dataAssignment.nameAssignment.length > 128) {
-            return validateException(res, "A nome da atividade não pode ultrapassar 128 caracteres")
-        }
-        if(dataAssignment.descriptionAssignment && dataAssignment.descriptionAssignment.length > 252) {
-            return validateException(res, "A descrição da atividade não pode ultrapassar 252 caracteres")
-        }
-        if(dataAssignment.typeAssignment && parseInt(dataAssignment.typeAssignment) === 0) {
-            return validateException(res, "É necessário escolher uma escolaridade")
-        }
-        if(dataAssignment.imageUpload && dataAssignment.imageUpload.stringBase64 && !dataAssignment.imageUpload.stringBase64.length) {
-            return validateException(res, "Nenhuma imagem foi selecionada")
-        }
-        if(dataAssignment.imageUpload && dataAssignment.imageUpload.name && !dataAssignment.imageUpload.name.length) {
-            return validateException(res, "A imagem selecionada não possui nome")
-        }
+    const trackValidate = (assignment) => {
+        let track = AssignmentUtils.validateAssignment(assignment);
 
-        return true
-    }
-
-    const getTypeEnum = (type) => {
-        if(parseFloat(type) == 1) {
-            return 'INFANT'
-        }
-        if(parseFloat(type) == 2) {
-            return 'FUNDAMENTAL'
-        }
-        if(parseFloat(type) == 3) {
-            return 'MEDIUM'
-        }
-        if(parseFloat(type) == 4) {
-            return 'UPPER'
-        }   
-    }
-
-    const isBoolean = (string) => {
-        if(string === 'true') {
-            return true
-        }
-        if(string === 'false') {
-            return false
+        if(track.message) {
+            return validateException(res, track.message, track.status);
+        } else {
+            return true;
         }
     }
 
-    if(dataUpload && validateAssignment(dataUpload)) {
-        if(dataUpload.user.id && dataUpload.user.id.length) {
+    try {
+        let userJWT = jwt.verify(token, process.env.JWT)
 
-            UserDAO.getUserById(dataUpload.user.id).then((data) => {
-                if(data && dataUpload.user.email === data.email) {
-                    let enumType = getTypeEnum(dataUpload.typeAssignment);
-                    let autorBool = isBoolean(dataUpload.isAutor);
-                    let dateNow = new Date();
-                    let data2 = new Date(dateNow.valueOf() - dateNow.getTimezoneOffset() * 60000);
-                    let dataBase = data2.toISOString().replace(/\.\d{3}Z$/, '');
+        if(userJWT.email !== undefined) {
+            UserDAO.getUserByEmail(userJWT.email).then(data => {
+                dataUpload.user = data;
+
+                try {
+                    if(dataUpload && trackValidate(dataUpload)) {
+                        if(dataUpload.user._id) {
+                            let enumType = AssignmentUtils.getTypeEnum(dataUpload.typeAssignment);
+                            let autorBool = dataUpload.isAutor;
+                            let dateNow = new Date();
+                            let data2 = new Date(dateNow.valueOf() - dateNow.getTimezoneOffset() * 60000);
+                            let dataBase = data2.toISOString().replace(/\.\d{3}Z$/, '');
+                
+                            let assignmentMongo = {
+                                nameAssignment: dataUpload.nameAssignment,
+                                descriptionAssignment: dataUpload.descriptionAssignment,
+                                typeAssignment: enumType,
+                                isAutor: autorBool,
+                                imageUpload: dataUpload.imageUpload,
+                                created: dataBase,
+                                modificated: null,
+                                userUploaded: dataUpload.user._id
+                            }
+                            res.status(403)
+                            res.send(assignmentMongo)
         
-                    let assignmentMongo = {
-                        nameAssignment: dataUpload.nameAssignment,
-                        descriptionAssignment: dataUpload.descriptionAssignment,
-                        typeAssignment: enumType,
-                        isAutor: autorBool,
-                        imageUpload: dataUpload.imageUpload,
-                        created: dataBase,
-                        modificated: null,
-                        userUploaded: dataUpload.user.id
-                    }
+                            return
 
-                    AssignmentDAO.createNewAssignment(assignmentMongo).then((data) => {
-                        let sendObj = {
-                            msg: 'Atividade criada com sucesso'
+                            AssignmentDAO.createNewAssignment(assignmentMongo).then((data) => {
+                                let sendObj = {
+                                    message: 'Atividade criada com sucesso'
+                                }
+                                res.status(Constants.STATUS.CREATED);
+                                res.send(sendObj);
+                            })
                         }
-                        res.status(201)
-                        res.send(sendObj)
-                    })
+                    }
+                } catch(e) {
+                    validateException(res, "Ocorreu um erro ao enviar a atividade", Constants.STATUS.FORBIDDEN, e);
                 }
             })
+        } else {
+            validateException(res, "Ocorreu um erro ao enviar a atividade", Constants.STATUS.UNAUTHORIZED, e);
         }
+
+    } catch(e) {
+        validateException(res, "Ocorreu um erro ao enviar a atividade", Constants.STATUS.UNAUTHORIZED, e);
     }
 }
