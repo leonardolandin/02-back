@@ -5,6 +5,9 @@ let Constants = {
         FORBIDDEN: 403,
         OK: 200,
         CREATED: 201
+    },
+    IMGUR: {
+        UPLOAD_IMAGE: 'https://api.imgur.com/3/image'
     }
 }
 

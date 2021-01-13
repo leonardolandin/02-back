@@ -44,6 +44,12 @@ let assignmentUtils = {
         }
 
         return true
+    },
+    replaceBase64: function(stringBase64) {
+        return stringBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
+    },
+    getMiMeTypeBase64: function(base64) {
+        return base64.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];
     }
 }
 

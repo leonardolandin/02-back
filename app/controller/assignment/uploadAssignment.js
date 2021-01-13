@@ -3,7 +3,7 @@ const UserDAO = require('../../dao/UserDAO');
 const jwt = require('jsonwebtoken');
 const Constants = require('../../utils/constants');
 const AssignmentUtils = require('../../utils/assignment');
-const { mongo } = require('mongoose');
+const http = require('../../config/axios');
 
 module.exports = (req, res) => {
     let token = req.headers.authorization;
@@ -40,32 +40,50 @@ module.exports = (req, res) => {
                     if(dataUpload && trackValidate(dataUpload)) {
                         if(dataUpload.user._id) {
                             let enumType = AssignmentUtils.getTypeEnum(dataUpload.typeAssignment);
-                            let autorBool = dataUpload.isAutor;
                             let dateNow = new Date();
                             let data2 = new Date(dateNow.valueOf() - dateNow.getTimezoneOffset() * 60000);
                             let dataBase = data2.toISOString().replace(/\.\d{3}Z$/, '');
-                
-                            let assignmentMongo = {
-                                nameAssignment: dataUpload.nameAssignment,
-                                descriptionAssignment: dataUpload.descriptionAssignment,
-                                typeAssignment: enumType,
-                                isAutor: autorBool,
-                                imageUpload: dataUpload.imageUpload,
-                                created: dataBase,
-                                modificated: null,
-                                userUploaded: dataUpload.user._id
-                            }
-                            res.status(403)
-                            res.send(assignmentMongo)
-        
-                            return
 
-                            AssignmentDAO.createNewAssignment(assignmentMongo).then((data) => {
-                                let sendObj = {
-                                    message: 'Atividade criada com sucesso'
+                            let imageImgur = {
+                                image: AssignmentUtils.replaceBase64(dataUpload.imageUpload.stringBase64),
+                                name: dataUpload.imageUpload.name,
+                                title: dataUpload.nameAssignment,
+                                description: dataUpload.descriptionAssignment,
+                                type: AssignmentUtils.getMiMeTypeBase64(dataUpload.imageUpload.stringBase64)
+                            }
+        
+                            http.post(Constants.IMGUR.UPLOAD_IMAGE, imageImgur, { headers: { 'Authorization': `Client-ID ${process.env.IMGUR_CLIENT}` } }).then(response => {
+                                if(response.data.success) {
+                                    let imgurResponse = response.data.data;
+
+                                    if(imgurResponse.link && imgurResponse.link.length) {
+                                        dataUpload.imageUpload.stringBase64 = imgurResponse.link;
+                                        
+                                        let assignmentMongo = {
+                                            nameAssignment: dataUpload.nameAssignment,
+                                            descriptionAssignment: dataUpload.descriptionAssignment,
+                                            typeAssignment: enumType,
+                                            isAutor: dataUpload.isAutor,
+                                            imageUpload: dataUpload.imageUpload,
+                                            created: dataBase,
+                                            modificated: null,
+                                            userUploaded: dataUpload.user._id,
+                                            active: true
+                                        }
+
+                                        AssignmentDAO.createNewAssignment(assignmentMongo).then((data) => {
+                                            let sendObj = {
+                                                message: 'Atividade criada com sucesso'
+                                            }
+                                            res.status(Constants.STATUS.CREATED);
+                                            res.send(sendObj);
+                                        }).catch(error => {
+                                            validateException(res, "Ocorreu um erro ao enviar a atividade", Constants.STATUS.FORBIDDEN, error);
+                                        })
+                                    }
                                 }
-                                res.status(Constants.STATUS.CREATED);
-                                res.send(sendObj);
+                            }).catch(error => {
+                                validateException(res, "Ocorreu um erro ao enviar a atividade", Constants.STATUS.FORBIDDEN, error.data.data.error);
                             })
                         }
                     }

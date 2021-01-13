@@ -12,7 +12,8 @@ const dataSchema = new mongoDB.MongoDB.Schema({
     imageUpload: Object,
     created: String,
     modificated: String || null,
-    userUploaded: String
+    userUploaded: String,
+    active: Boolean
 })
 const Assignment = mongoDB.MongoDB.model('assignment', dataSchema, 'assignments')
 
