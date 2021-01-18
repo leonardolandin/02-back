@@ -25,7 +25,7 @@ const mongoDB = {
         });
     },
     close: function() {
-        MongoDB.connection.close();
+        MongoDB.disconnect();
         console.log("> Conexão com MongDB Fechada");
     },
     MongoDB: MongoDB
