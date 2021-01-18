@@ -30,7 +30,7 @@ let assignmentUtils = {
                 status: Constants.STATUS.FORBIDDEN
             }
         }
-        if(dataAssignment.imageUpload && dataAssignment.imageUpload.stringBase64 && !dataAssignment.imageUpload.stringBase64.length) {
+        if(dataAssignment.imageUpload && dataAssignment.imageUpload.path && !dataAssignment.imageUpload.path.length) {
             return {
                 message: 'Nenhuma imagem foi selecionada',
                 status: Constants.STATUS.FORBIDDEN
@@ -45,8 +45,8 @@ let assignmentUtils = {
 
         return true
     },
-    replaceBase64: function(stringBase64) {
-        return stringBase64.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
+    replaceBase64: function(path) {
+        return path.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
     },
     getMiMeTypeBase64: function(base64) {
         return base64.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];

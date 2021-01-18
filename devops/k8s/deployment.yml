@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: 02-back
+  name: 02-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: 02-back
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: 02-back
+    spec:
+      containers:
+      - image: 02-back
+        name: 02-back
+        imagePullPolicy: Never
+        resources: {}
+        envFrom:
+          - configMapRef:
+              name: 02-configmap
+          - secretRef:
+              name: 02-secret
+        ports:
+          - containerPort: 8081 
+status: {}

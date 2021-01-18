@@ -1,0 +1,8 @@
+kind: ConfigMap 
+apiVersion: v1 
+metadata:
+  name: 02-configmap 
+data:
+  CORS_ORIGINS: "[\"http://localhost:8080\", \"https://front-02.herokuapp.com\"]"
+  ENCRYPT_ALGORITHM: aes256
+  ENCRYPT_TYPE: hex

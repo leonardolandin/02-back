@@ -45,11 +45,11 @@ module.exports = (req, res) => {
                             let dataBase = data2.toISOString().replace(/\.\d{3}Z$/, '');
 
                             let imageImgur = {
-                                image: AssignmentUtils.replaceBase64(dataUpload.imageUpload.stringBase64),
+                                image: AssignmentUtils.replaceBase64(dataUpload.imageUpload.path),
                                 name: dataUpload.imageUpload.name,
                                 title: dataUpload.nameAssignment,
                                 description: dataUpload.descriptionAssignment,
-                                type: AssignmentUtils.getMiMeTypeBase64(dataUpload.imageUpload.stringBase64)
+                                type: AssignmentUtils.getMiMeTypeBase64(dataUpload.imageUpload.path)
                             }
         
                             http.post(Constants.IMGUR.UPLOAD_IMAGE, imageImgur, { headers: { 'Authorization': `Client-ID ${process.env.IMGUR_CLIENT}` } }).then(response => {
@@ -57,7 +57,7 @@ module.exports = (req, res) => {
                                     let imgurResponse = response.data.data;
 
                                     if(imgurResponse.link && imgurResponse.link.length) {
-                                        dataUpload.imageUpload.stringBase64 = imgurResponse.link;
+                                        dataUpload.imageUpload.path = imgurResponse.link;
                                         
                                         let assignmentMongo = {
                                             nameAssignment: dataUpload.nameAssignment,

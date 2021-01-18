@@ -9,7 +9,11 @@ app.use(bodyParser.json({
     extended: true
 }));
 
-let whiteList = JSON.parse(process.env.CORS_ORIGINS);
+let whiteList = [];
+
+if(process.env.CORS_ORIGINS) {
+    whiteList = JSON.parse(process.env.CORS_ORIGINS);
+}
 
 let corsOptions = {
     origin: function(origin, callback) {

@@ -5,7 +5,8 @@ const mongoDB = {
     connect: async function() {
         MongoDB.connect(process.env.MONGO_DB, {
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            bufferMaxEntries: 0
         });
 
         const database = MongoDB.connection;
