@@ -7,7 +7,7 @@ AssignmentDAO.createNewAssignment = async function(assignmentInfos) {
         return Assignment.insertMany(assignmentInfos, (err, result) => {
             return new Promise((resolve, reject) => {
                 resolve(result)
-                MongoDB.close();
+                MongoDB.disconnect();
             })
         })
     }
@@ -18,7 +18,7 @@ AssignmentDAO.getAssignments = async function() {
         return Assignment.find({}, {_id: 1, imageUpload: 1, nameAssignment: 1} ,(err, result) => {
             return new Promise((resolve, reject) => {
                 resolve(result)
-                MongoDB.close();
+                MongoDB.disconnect();
             })
         })
     }
@@ -29,7 +29,7 @@ AssignmentDAO.getAssignmentById = async function(idAssigment) {
         return Assignment.findOne({'_id':idAssigment}, (err, result) => {
             return new Promise((resolve, reject) => {
                 resolve(result)
-                MongoDB.close();
+                MongoDB.disconnect();
             })
         })
     }
