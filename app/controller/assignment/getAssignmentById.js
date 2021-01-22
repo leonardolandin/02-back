@@ -1,8 +1,6 @@
 const AssignmentDAO = require('../../dao/AssignmentDAO');
 
 module.exports = (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
-
     let dataAssignment = req.params
 
     if(dataAssignment && dataAssignment.idAssignment) {
