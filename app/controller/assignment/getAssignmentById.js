@@ -1,5 +1,4 @@
 const AssignmentDAO = require('../../dao/AssignmentDAO');
-const { response } = require('express');
 
 module.exports = (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");

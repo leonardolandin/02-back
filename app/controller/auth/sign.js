@@ -2,37 +2,23 @@ const UserDAO = require('../../dao/UserDAO');
 const jwt = require('jsonwebtoken');
 const Crypt = require('../../utils/crypt');
 const Constants = require('../../utils/constants');
+const UserUtils = require('../../utils/user');
 const http = require('../../config/axios');
 require('dotenv/config');
 
 
 module.exports = (req, res) => {
     const ValidateCredentials = (objUser) => {
-        if(objUser && objUser.email && objUser.email.length > 254) {
-            return ValidationException('O e-mail não pode conter mais de 254 caracteres', res)
-        }
-        if(objUser && objUser.email && !objUser.email.includes('@')) {
-            return ValidationException('O e-mail inserido não contém um formato de e-mail válido (@)', res)
-        }
-        if(objUser && objUser.name && objUser.name.length > 120) {
-            return ValidationException('O nome não pode conter mais de 120 caracteres', res)
-        }
-        if(objUser && objUser.password && objUser.password.length > 128) {
-            return ValidationException('A senha não pode conter mais de 128 caracteres', res)
-        }
-        if(objUser && objUser.password && objUser.passwordConfirmed) {
-            if(objUser.password !== objUser.passwordConfirmed) {
-                return ValidationException('As senhas não conferem', res)
-            }
-        }
-        if(objUser && objUser.password && objUser.password.length <= 6 && objUser.passwordConfirmed && objUser.passwordConfirmed.length <= 6) {
-            return ValidationException('A senha precisa conter mais de 6 caracteres', res)
-        }
+        let track = UserUtils.validateSign(objUser);
 
-        return true;
+        if(track.message) {
+            return ValidationException(res, track.message, track.status);
+        } else {
+            return true;
+        }
     }
 
-    const ValidationException = (message, response, codeError) => {
+    const ValidationException = (response, message, codeError) => {
         let sendObject = {
             message: message,
             error: codeError
@@ -77,11 +63,11 @@ module.exports = (req, res) => {
                             })
                         }
                     } catch (e) {
-                        return ValidationException('Ocorreu um erro inesperado', res, e)
+                        return ValidationException(res ,'Ocorreu um erro inesperado', e)
                     }
                 })
             } else {
-                return ValidationException('O e-mail já está cadastrado no site', res)
+                return ValidationException(res ,'O e-mail já está cadastrado no site')
             }
         })
     }

@@ -1,36 +1,29 @@
 const UserDAO = require('../../dao/UserDAO');
-const Crypt = require('../../utils/crypt');
 const jwt = require('jsonwebtoken');
-const Constants = require('../../utils/constants');
 const http = require('../../config/axios');
+const Constants = require('../../utils/constants');
+const Crypt = require('../../utils/crypt');
+const UserUtils = require('../../utils/user');
 
 require('dotenv/config');
 
 module.exports = (req, res) => {
-    const ValidationException = (message, response) => {
+    const ValidationException = (response, message, status) => {
         let sendObject = {
             message: message
         }
-        response.status(Constants.STATUS.UNAUTHORIZED)
+        response.status(status)
         response.send(sendObject)
     }
 
     const ValidationUser = (user) => {
-        if(user.email && user.password) {
-            if(user.email.length > 254) {
-                return ValidationException('O e-mail não pode conter mais de 254 caracteres', res)
-            }
-            if(!user.email.includes('@')) {
-                return ValidationException('O e-mail inserido não contém um formato de e-mail válido (@)', res)
-            }
-            if(user.password.length > 128) {
-                return ValidationException('A senha não pode conter mais de 128 caracteres', res)
-            }
-        } else {
-            return ValidationException('Nenhum campo preenchido', res)
-        }
+        let track = UserUtils.validateLogin(user);
 
-        return true
+        if(track.message) {
+            return ValidationException(res, track.message, track.status);
+        } else {
+            return true;
+        }
     }
 
     let dataUser = req.body;
@@ -39,7 +32,7 @@ module.exports = (req, res) => {
         UserDAO.getUserByEmail(dataUser.email).then((data) => {
             let dataDAO = data;
             if(dataDAO === null) {
-               return ValidationException('Não existe um usuário com esse e-mail', res) 
+               return ValidationException(res, 'Não existe um usuário com esse e-mail', Constants.STATUS.FORBIDDEN) 
             }
 
             dataDAO.password = Crypt.decryptPassword(dataDAO.password);
@@ -75,12 +68,11 @@ module.exports = (req, res) => {
                                 }
                             }
                         } catch (e) {
-                            res.status(Constants.STATUS.UNAUTHORIZED)
-                            res.send(e)
+                            return ValidationException(res, e, Constants.STATUS.FORBIDDEN)
                         }
                 })
             } else {
-                return ValidationException('Usuário com essas credenciais não existe', res)
+                return ValidationException(res, 'Usuário com essas credenciais não existe', Constants.STATUS.FORBIDDEN)
             }
         })
 
