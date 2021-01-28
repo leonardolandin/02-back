@@ -1,18 +1,30 @@
 const AssignmentDAO = require('../../dao/AssignmentDAO');
+const jwt = require('jsonwebtoken');
 
 module.exports = (req, res) => {
-    let dataAssignment = req.params
+    let dataAssignment = req.params;
+    let token = req.headers.authorization;
 
-    if(dataAssignment && dataAssignment.idAssignment) {
-        if(dataAssignment.idAssignment.length) {
-            let idAssignment = dataAssignment.idAssignment;
+    try {
+        if(dataAssignment && dataAssignment.idAssignment) {
+            if(dataAssignment.idAssignment.length) {
+                let idAssignment = dataAssignment.idAssignment;
 
-            AssignmentDAO.getAssignmentById(idAssignment).then((responseData) => {
-                if(responseData) {
-                    res.send(responseData)
+                let userJWT = jwt.verify(token, process.env.JWT);
+
+                if(userJWT.email !== undefined) {
+                    
                 }
-            })
+    
+                AssignmentDAO.getAssignmentById(idAssignment).then((responseData) => {
+                    if(responseData) {
+                        AssignmentDAO.verifyAction();
+                        res.send(responseData)
+                    }
+                })
+            }
         }
-    }
+    } catch(e) {
 
+    }
 }

@@ -1,4 +1,5 @@
-const Assignment = require('../model/AssignmentModel')
+const Assignment = require('../model/AssignmentModel');
+const AssignmentActions = require('../model/ActionsAssignmentModel');
 const AssignmentDAO = {}
 
 AssignmentDAO.createNewAssignment = async function(assignmentInfos) {
@@ -19,6 +20,30 @@ AssignmentDAO.getAssignments = async function() {
 
 AssignmentDAO.getAssignmentById = async function(idAssigment) {
     return Assignment.findOne({'_id':idAssigment}, (err, result) => {
+        return new Promise((resolve, reject) => {
+            resolve(result)
+        })
+    })
+}
+
+AssignmentDAO.verifyAction = async function(likeAssignment) {
+    return AssignmentActions.findOne({ 'assignment': likeAssignment.assignment, 'user': likeAssignment.user }, (err, result) => {
+        return new Promise((resolve, reject) => {
+            resolve(result)
+        })
+    })
+}
+
+AssignmentDAO.createAction = async function(action) {
+    return AssignmentActions.insertMany(action, (err, result) => {
+        return new Promise((resolve, reject) => {
+            resolve(result)
+        })
+    })
+}
+
+AssignmentDAO.updateAction = async function(queryParams, action) {
+    return AssignmentActions.updateOne({ 'assignment': queryParams.assignment, 'user': queryParams.user }, action, (err, result) => {
         return new Promise((resolve, reject) => {
             resolve(result)
         })

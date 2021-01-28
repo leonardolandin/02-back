@@ -34,6 +34,8 @@ app.use(express.json());
 app.use('/', routes);
 app.use('/uploadAssignments/', routes);
 app.use('/getAssignment/:idAssignment', routes);
+app.use('/likeAssignment', routes);
+app.use('/favoriteAssignment', routes)
 
 //Auth
 app.use('/userLogged', routes);
