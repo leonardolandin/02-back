@@ -19,15 +19,15 @@ AssignmentDAO.getAssignments = async function() {
 }
 
 AssignmentDAO.getAssignmentById = async function(idAssigment) {
-    return Assignment.findOne({'_id':idAssigment}, (err, result) => {
+    return Assignment.findOne({'_id':idAssigment}, { __v: 0 } ,(err, result) => {
         return new Promise((resolve, reject) => {
             resolve(result)
         })
     })
 }
 
-AssignmentDAO.verifyAction = async function(likeAssignment) {
-    return AssignmentActions.findOne({ 'assignment': likeAssignment.assignment, 'user': likeAssignment.user }, (err, result) => {
+AssignmentDAO.verifyAction = async function(actionAssignment) {
+    return AssignmentActions.findOne({ 'assignment': actionAssignment.assignment, 'user': actionAssignment.user }, { _id: 0, __v: 0 } ,(err, result) => {
         return new Promise((resolve, reject) => {
             resolve(result)
         })
@@ -51,16 +51,3 @@ AssignmentDAO.updateAction = async function(queryParams, action) {
 }
 
 module.exports = AssignmentDAO;
-
-
-
-
-
-
-
-
-
-
-
-
-

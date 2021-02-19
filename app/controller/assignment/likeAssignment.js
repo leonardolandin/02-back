@@ -20,7 +20,7 @@ module.exports = (req, res) => {
                 if(response == null) {
                     likeAction.favorite = false;
                     AssignmentDAO.createAction(likeAction).then(data => {
-                        res.status(Constants.STATUS.OK)
+                        res.status(Constants.STATUS.CREATED)
                         res.send(likeAction)
                     })
                 } else {
@@ -28,7 +28,8 @@ module.exports = (req, res) => {
                         like: likeAction.like
                     }
                     AssignmentDAO.updateAction(likeAction, likeCreated).then(data => {
-                        console.log(data)
+                        res.status(Constants.STATUS.OK);
+                        res.send(likeCreated);
                     })
                 }
             })
