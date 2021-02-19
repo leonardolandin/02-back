@@ -40,7 +40,7 @@ let userUtils = {
             }
         }
     },
-    validateSign: function() {
+    validateSign: function(objUser) {
         if(objUser && objUser.email && objUser.email.length > 254) {
             return {
                 message: 'O e-mail não pode conter mais de 254 caracteres',
