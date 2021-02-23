@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const Constants = require('../../utils/constants');
 const AssignmentUtils = require('../../utils/assignment');
 const http = require('../../config/axios');
+const moment = require('moment-timezone');
 
 module.exports = (req, res) => {
     let token = req.headers.authorization;
@@ -40,9 +41,7 @@ module.exports = (req, res) => {
                     if(dataUpload && trackValidate(dataUpload)) {
                         if(dataUpload.user._id) {
                             let enumType = AssignmentUtils.getTypeEnum(dataUpload.typeAssignment);
-                            let dateNow = new Date();
-                            let data2 = new Date(dateNow.valueOf() - dateNow.getTimezoneOffset() * 60000);
-                            let dataBase = data2.toISOString().replace(/\.\d{3}Z$/, '');
+                            let momentDate = moment(new Date()).tz("America/Sao_Paulo").format('YYYY-MM-DDTHH:mm:ss');
 
                             let imageImgur = {
                                 image: AssignmentUtils.replaceBase64(dataUpload.imageUpload.path),
@@ -65,7 +64,7 @@ module.exports = (req, res) => {
                                             typeAssignment: enumType,
                                             isAutor: dataUpload.isAutor,
                                             imageUpload: dataUpload.imageUpload,
-                                            created: dataBase,
+                                            created: momentDate,
                                             modificated: null,
                                             userUploaded: dataUpload.user._id,
                                             active: true
@@ -75,6 +74,7 @@ module.exports = (req, res) => {
                                             let sendObj = {
                                                 message: 'Atividade criada com sucesso'
                                             }
+
                                             res.status(Constants.STATUS.CREATED);
                                             res.send(sendObj);
                                         }).catch(error => {
@@ -92,7 +92,7 @@ module.exports = (req, res) => {
                 }
             })
         } else {
-            validateException(res, "Ocorreu um erro ao enviar a atividade", Constants.STATUS.UNAUTHORIZED, e);
+            validateException(res, "É necessário estar logado", Constants.STATUS.UNAUTHORIZED, e);
         }
 
     } catch(e) {

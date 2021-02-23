@@ -4,6 +4,7 @@ const Crypt = require('../../utils/crypt');
 const Constants = require('../../utils/constants');
 const UserUtils = require('../../utils/user');
 const http = require('../../config/axios');
+const moment = require('moment-timezone');
 require('dotenv/config');
 
 
@@ -43,14 +44,13 @@ module.exports = (req, res) => {
                         let parsedResponse = response.data;
 
                         if(userToken !== null && parsedResponse !== null && parsedResponse.success) {
-                            let dateNow = new Date();
-                            dateNow.setSeconds(0, 0);
-                            dataUser.password = Crypt.encryptPassword(dataUser.password);
+                            let momentDate = moment(new Date()).tz("America/Sao_Paulo").format('YYYY-MM-DDTHH:mm:ss');
 
+                            dataUser.password = Crypt.encryptPassword(dataUser.password);
                             dataUser.token = userToken;
                             dataUser.active = true;
                             dataUser.completeRegister = true;
-                            dataUser.created = dateNow;
+                            dataUser.created = momentDate;
                             dataUser.modificated = null;
 
                             UserDAO.createNewUser(dataUser).then((result) => {
