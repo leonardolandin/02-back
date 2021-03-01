@@ -41,5 +41,6 @@ app.use('/favoriteAssignment', routes)
 app.use('/userLogged', routes);
 app.use('/login', routes);
 app.use('/register', routes);
+app.use('/processNewTokenRemember', routes)
 
 module.exports = app;

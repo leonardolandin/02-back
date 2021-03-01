@@ -81,6 +81,23 @@ let userUtils = {
         }
 
         return true;
+    },
+    validateRememberEmail: function(email) {
+        if(email == null || !email.trim().length) {
+            return {
+                message: 'É necessário digitar um e-mail',
+                status: Constants.STATUS.FORBIDDEN
+            }            
+        }
+
+        if(!email.includes('@')) {
+            return {
+                message: 'O e-mail inserido não contém um formato de e-mail válido (@)',
+                status: Constants.STATUS.FORBIDDEN
+            }
+        }
+
+        return true;
     }
 }
 

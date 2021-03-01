@@ -11,6 +11,9 @@ let crypt = {
         const cipher = crypto.createCipher(process.env.ENCRYPT_ALGORITHM, process.env.ENCRYPT_KEY);
         cipher.update(password);
         return cipher.final(process.env.ENCRYPT_TYPE);
+    },
+    createRandomBytes: (size, type) => {
+        return crypto.randomBytes(size).toString(type);
     }
 }
 

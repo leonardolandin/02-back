@@ -1,5 +1,5 @@
-const Assignment = require('../model/AssignmentModel');
-const AssignmentActions = require('../model/ActionsAssignmentModel');
+const Assignment = require('../model/assignment/AssignmentModel');
+const AssignmentActions = require('../model/assignment/ActionsAssignmentModel');
 const AssignmentDAO = {}
 
 AssignmentDAO.createNewAssignment = async function(assignmentInfos) {

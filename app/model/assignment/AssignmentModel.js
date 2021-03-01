@@ -1,4 +1,4 @@
-const mongoDB = require('../database');
+const mongoDB = require('../../database');
 
 const dataSchema = new mongoDB.MongoDB.Schema({
     nameAssignment: String,

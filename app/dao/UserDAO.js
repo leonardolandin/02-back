@@ -1,4 +1,6 @@
-const User = require('../model/UserModel')
+const User = require('../model/UserModel');
+const TransactionsRemember = require('../model/TransactionsRemember');
+
 const UserDAO = {}
 
 UserDAO.getUserByEmail = async function(email) {
@@ -29,6 +31,14 @@ UserDAO.createNewUser = async function(newUserCredentials) {
     return User.insertMany(newUserCredentials, (err, result) => {
         return new Promise((resolve, reject) => {
             resolve(result)
+        })
+    })
+}
+
+UserDAO.createNewTransaction = async function(transaction) {
+    return TransactionsRemember.insertMany(transaction, (err, result) => {
+        return new Promise((resolve, reject) => {
+            resolve(result);
         })
     })
 }

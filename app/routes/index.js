@@ -7,6 +7,7 @@ const login = require('../controller/auth/login');
 const register = require('../controller/auth/sign');
 const likeAssignment = require('../controller/assignment/likeAssignment');
 const favoriteAssignment = require('../controller/assignment/favoriteAssignment');
+const tokenRemember = require('../controller/auth/processNewTokenRemember');
 
 
 //Assignment's
@@ -21,5 +22,6 @@ routes.post('/favoriteAssignment', favoriteAssignment);
 routes.post('/userLogged', getUser);
 routes.post('/login', login);
 routes.post('/register', register);
+routes.post('/processNewTokenRemember', tokenRemember);
 
 module.exports = routes;
