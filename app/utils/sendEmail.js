@@ -1,24 +1,35 @@
 const Mailer = require('nodemailer');
+require('dotenv/config');
 
-const sendEmail = (sendObj) => {
-    let sender  = Mailer.createTransport({
-        host: '',
-        service: '',
-        port: 587,
-        secure: true,
-        auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASS
-        }
-    })
+const sendEmail = async (sendObj) => {
 
-    sendObj.from = process.env.EMAIL;
+    try {
+        let sender  = Mailer.createTransport({
+            host: 'smtp.gmail.com',
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.EMAIL_PASS
+            }
+        })
+    
+        sendObj.from = process.env.EMAIL;
+    
+        return sender.sendMail(sendObj).then(response => {
+            return new Promise((resolve, reject) => {
+                resolve(response)
+            })
+        }).catch(err => {
+            return new Promise((resolve, reject) => {
+                resolve(err)
+            })
+        })
+    } catch (e) {
+        return new Promise((resolve, reject) => {
+            resolve(e)
+        })
+    }
 
-    sender.sendMail(sendObj).then(response => {
-        console.log(response)
-    }).catch(err => {
-        console.log(err)
-    })
 }
 
 module.exports = sendEmail;

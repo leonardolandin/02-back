@@ -3,6 +3,7 @@ const Sender = require('../../utils/sendEmail');
 const UserDAO = require('../../dao/UserDAO');
 const Crypt = require('../../utils/crypt');
 const moment = require('moment-timezone');
+const Constants = require('../../utils/constants');
 
 module.exports = (req, res) => {
     const ValidationException = (response, message, status) => {
@@ -41,25 +42,36 @@ module.exports = (req, res) => {
                     active: true
                 }
 
-                console.log(typeof date)
-
                 UserDAO.createNewTransaction(rememberObj).then(dataTransaction => {
-                    //rememberObj.message = `A redefinição de senha foi enviada para o e-mail: ${data.email}`;
-
                     let emailSender = {
                         to: data.email,
                         subject: "Recuperação de senha - 02",
-                        text: `Acesse para recuperar a sua senha: /n ${req.headers.referer}/${rememberObj.token}` 
+                        text: `Acesse para recuperar a sua senha: ${req.headers.referer}/${rememberObj.token}` 
                     }
 
-                    Sender(emailSender);
+                    Sender(emailSender).then(email => {
+                        if(email.response.includes('250') || email.response.includes('OK')) {
+                            responseObj = {
+                                remember: rememberObj,
+                                message: `A redefinição de senha foi enviada para o e-mail:`,
+                                email: data.email
+                            }
+
+                            res.status(Constants.STATUS.OK);
+                            res.send(responseObj);
+                        }
+                    }).catch(erro => {
+                        ValidationException(res, "Ocorreu um erro ao enviar o e-mail", Constants.STATUS.INTERNAL_ERROR);
+                    })
 
                 }).catch(error => {
-
+                    ValidationException(res, "Ocorreu um erro inesperado", Constants.STATUS.INTERNAL_ERROR);
                 })
+            } else {
+                ValidationException(res, "Não existe nenhum cadastro com esse e-mail", Constants.STATUS.FORBIDDEN);
             }
         }).catch(error => {
-            console.log(error);
+            ValidationException(res, "Ocorreu um erro inesperado", Constants.STATUS.FORBIDDEN);
         })
     }
 }
